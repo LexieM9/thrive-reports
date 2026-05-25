@@ -1,368 +1,381 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thrive Performance — Session Report Generator</title>
+<title>Thrive Performance — Session Report</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
-.wrap{max-width:700px;margin:0 auto;padding:1.5rem 1rem}
-input,select,textarea{font-family:inherit;font-size:13px;padding:8px 11px;border:1px solid #ddd;border-radius:8px;width:100%;color:#1a1a1a;background:#fff;outline:none}
-input:focus,select:focus,textarea:focus{border-color:#003DA5;box-shadow:0 0 0 3px #003DA520}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f4;color:#1a1a1a}
+.wrap{max-width:680px;margin:0 auto;padding:1.25rem 1rem 3rem}
+input,select,textarea{font-family:inherit;font-size:14px;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;width:100%;color:#1a1a1a;background:#fff;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:#003DA5;outline:none;box-shadow:0 0 0 3px rgba(0,61,165,0.12)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 textarea{resize:vertical;line-height:1.6}
-button{font-family:inherit;font-size:13px;padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;transition:background .15s}
-button:hover{background:#f0f0f0}
-.btn-p{background:#003DA5;color:#fff;border-color:#003DA5}
-.btn-p:hover{background:#002D7A}
-label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:500}
-.card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1.25rem;margin-bottom:16px}
-.sec-title{font-size:11px;font-weight:600;color:#003DA5;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-table{width:100%;border-collapse:collapse}
-th{font-size:11px;font-weight:600;padding:8px 10px;letter-spacing:.04em;text-align:left;white-space:nowrap;background:#003DA5;color:#fff}
-th.c,td.c{text-align:center}
-td{font-size:13px;padding:8px 10px;border-bottom:1px solid #f0f0f0}
+button{font-family:inherit;font-size:14px;padding:10px 18px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:active{opacity:0.8}
+.btn-p{background:#003DA5;color:#fff;border-color:#003DA5;font-weight:600}
+label.field-label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:600;letter-spacing:0.02em}
+.card{background:#fff;border:1px solid #e4e4e4;border-radius:12px;padding:1.25rem;margin-bottom:14px}
+.sec-title{font-size:11px;font-weight:700;color:#003DA5;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:700;padding:9px 10px;text-align:left;background:#003DA5;color:#fff;letter-spacing:0.04em}
+th.c{text-align:center}
+td{padding:9px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-td.pos{color:#1a7a3b;font-weight:600;text-align:center}
-td.neg{color:#b83232;font-weight:600;text-align:center}
-td.neu{color:#999;text-align:center}
-.badge{display:inline-block;font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;background:#eef3fc;color:#003DA5}
-.progress{display:flex;gap:4px;margin-bottom:24px}
-.prog-item{flex:1;text-align:center}
-.prog-bar{height:3px;border-radius:2px;margin-bottom:5px;transition:background .25s}
-.prog-label{font-size:10px;font-weight:500}
-.file-label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a}
-.file-label:hover{background:#f5f5f5}
-.summary-box{background:#f7f9ff;border:1px solid #ccd7f0;border-radius:12px;padding:1.25rem;margin-bottom:20px}
-.tbl-wrap{overflow-x:auto;margin-bottom:24px}
-.meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{background:#eef3fc;border-radius:8px;padding:5px 12px;text-align:center}
-.chip-label{font-size:10px;color:#003DA5;text-transform:uppercase;letter-spacing:.05em;display:block}
-.chip-val{font-size:12px;font-weight:600;color:#1a1a1a}
-.nav{display:flex;margin-top:24px}
-.nav.spread{justify-content:space-between}
-.nav.right{justify-content:flex-end}
-@media print{
-  .no-print{display:none!important}
-  body{background:#fff}
-  .card,.summary-box{box-shadow:none;border:1px solid #ddd}
-}
-@media(max-width:500px){.grid2,.grid3{grid-template-columns:1fr}}
+tr:nth-child(even){background:#fafafa}
+.tc{text-align:center}
+.tp{color:#1a7a3b;font-weight:700;text-align:center}
+.tn{color:#b83232;font-weight:700;text-align:center}
+.tg{color:#999;text-align:center}
+.tbw{overflow-x:auto;margin-bottom:22px;border-radius:8px;border:1px solid #e4e4e4}
+.prog{display:flex;gap:3px;margin-bottom:22px}
+.pi{flex:1;text-align:center}
+.pb{height:3px;border-radius:2px;margin-bottom:5px}
+.pl{font-size:10px;font-weight:600}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{background:#eef3fc;border-radius:8px;padding:5px 11px}
+.cl{font-size:10px;color:#003DA5;text-transform:uppercase;letter-spacing:0.05em;display:block;font-weight:600}
+.cv{font-size:12px;font-weight:700;color:#1a1a1a}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:9px 16px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-weight:500}
+.nav{display:flex;margin-top:20px;gap:10px}
+.nav.sb{justify-content:space-between}
+.nav.fe{justify-content:flex-end}
+@media(max-width:480px){.g2{grid-template-columns:1fr}}
+@media print{.no-print{display:none!important}body{background:#fff}.card{box-shadow:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="no-print" style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-    <div style="width:34px;height:34px;border-radius:8px;background:#003DA5;display:flex;align-items:center;justify-content:center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44l-1.02-5.1A2.5 2.5 0 0 1 7.5 11H3a2.5 2.5 0 0 1 0-5h4.5A2.5 2.5 0 0 1 9.5 2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44l1.02-5.1A2.5 2.5 0 0 0 16.5 11H21a2.5 2.5 0 0 0 0-5h-4.5A2.5 2.5 0 0 0 14.5 2z"/></svg>
+    <div style="width:36px;height:36px;border-radius:9px;background:#003DA5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
     </div>
     <div>
-      <div style="font-size:15px;font-weight:600;color:#1a1a1a">Thrive Performance</div>
+      <div style="font-size:16px;font-weight:700">Thrive Performance</div>
       <div style="font-size:11px;color:#888">Session Report Generator</div>
     </div>
   </div>
-  <div id="app"></div>
+  <div id="app"><p style="color:#888;padding:20px">Loading...</p></div>
 </div>
 
 <script>
-const B='#003DA5';
-const STEPS=['Setup','Pre Putting','Mind Training','Post + Focus Golf','Report'];
-const PUT_KEYS=[
-  {k:'score',l:'Total Score',u:'/100'},
-  {k:'faceChange',l:'Face Change',u:'%'},
-  {k:'track',l:'Track',u:'%'},
-  {k:'consistency',l:'Consistency',u:'%'},
-  {k:'tempo',l:'Tempo',u:'%'},
-  {k:'rotation',l:'Rotation',u:'%'},
-  {k:'trembling',l:'Trembling',u:'%'},
-  {k:'handling',l:'Handling',u:'%'},
+var B = '#003DA5';
+var STEPS = ['Setup', 'Pre Putting', 'Mind Training', 'Post + Focus Golf', 'Report'];
+
+var PUT_KEYS = [
+  {k:'score',    l:'Total Score',  u:'/100'},
+  {k:'face',     l:'Face Change',  u:'%'},
+  {k:'track',    l:'Track',        u:'%'},
+  {k:'consist',  l:'Consistency',  u:'%'},
+  {k:'tempo',    l:'Tempo',        u:'%'},
+  {k:'rotation', l:'Rotation',     u:'%'},
+  {k:'trembling',l:'Trembling',    u:'%'},
+  {k:'handling', l:'Handling',     u:'%'}
 ];
-const MIND_KEYS=[
-  {k:'earnedRR',l:'Earned Reward Rate',u:'%'},
-  {k:'avgReward',l:'Avg Reward Duration',u:'s'},
-  {k:'longest',l:'Longest Reward',u:'s'},
-  {k:'peakCalm',l:'Peak Calm Focus',u:''},
-  {k:'focusPct',l:'Focus %',u:'%'},
-  {k:'calmPct',l:'Calm %',u:'%'},
-  {k:'resistStress',l:'Resist Stress',u:'%'},
-  {k:'resistFatigue',l:'Resist Fatigue',u:'%'},
+var MIND_KEYS = [
+  {k:'rr',       l:'Earned Reward Rate',       u:'%'},
+  {k:'avgR',     l:'Avg Reward Duration',       u:'s'},
+  {k:'longR',    l:'Longest Reward',            u:'s'},
+  {k:'peakCalm', l:'Peak Calm Focus',           u:''},
+  {k:'focusPct', l:'Focus %',                   u:'%'},
+  {k:'calmPct',  l:'Calm %',                    u:'%'},
+  {k:'stress',   l:'Resist Stress',             u:'%'},
+  {k:'fatigue',  l:'Resist Fatigue',            u:'%'}
 ];
-const FG_KEYS=[
-  {k:'earnedRR',l:'Earned Reward Rate',u:'%'},
-  {k:'avgReward',l:'Avg Reward Duration',u:'s'},
-  {k:'longest',l:'Longest Reward',u:'s'},
-  {k:'peakCalm',l:'Peak Calm Focus',u:''},
+var FG_KEYS = [
+  {k:'rr',       l:'Earned Reward Rate',  u:'%'},
+  {k:'avgR',     l:'Avg Reward Duration', u:'s'},
+  {k:'longR',    l:'Longest Reward',      u:'s'},
+  {k:'peakCalm', l:'Peak Calm Focus',     u:''}
 ];
 
-const emptyObj=keys=>Object.fromEntries(keys.map(({k})=>[k,'']));
-let S={
-  step:0,summary:'',prevSession:null,
-  d:{
-    sessionNum:'1',date:new Date().toISOString().split('T')[0],
-    athlete:'',trainer:'',putterType:'Blade',handed:'Right',
-    puttLen:'',puttUnit:'ft',surface:'Indoor',green:'Artificial',goal:'',
-    pre:emptyObj(PUT_KEYS),mind:emptyObj(MIND_KEYS),
-    post:emptyObj(PUT_KEYS),fg:emptyObj(FG_KEYS)
+function emptyObj(keys) {
+  var o = {};
+  for (var i = 0; i < keys.length; i++) o[keys[i].k] = '';
+  return o;
+}
+
+var S = {
+  step: 0,
+  summary: '',
+  prevSession: null,
+  d: {
+    num: '1',
+    date: new Date().toISOString().slice(0,10),
+    athlete: '', trainer: '',
+    putterType: 'Blade', handed: 'Right',
+    puttLen: '', puttUnit: 'ft',
+    surface: 'Indoor', green: 'Artificial',
+    goal: '',
+    pre:  emptyObj(PUT_KEYS),
+    mind: emptyObj(MIND_KEYS),
+    post: emptyObj(PUT_KEYS),
+    fg:   emptyObj(FG_KEYS)
   }
 };
 
-function set(path,val){
-  const p=path.split('.');
-  if(p.length===1)S.d[p[0]]=val;
-  else S.d[p[0]][p[1]]=val;
+function setD(path, val) {
+  var p = path.split('.');
+  if (p.length === 1) { S.d[p[0]] = val; }
+  else { S.d[p[0]][p[1]] = val; }
   render();
 }
-function setSt(k,v){S[k]=v;render();}
+function setSt(k, v) { S[k] = v; render(); }
 
-function delta(a,b){
-  const x=parseFloat(a),y=parseFloat(b);
-  if(isNaN(x)||isNaN(y))return null;
-  return parseFloat((x-y).toFixed(1));
+function dlt(a, b) {
+  var x = parseFloat(a), y = parseFloat(b);
+  if (isNaN(x) || isNaN(y)) return null;
+  return Math.round((x - y) * 10) / 10;
 }
-function dCell(a,b){
-  const d=delta(a,b);
-  if(d===null)return'<td class="neu">—</td>';
-  return`<td class="${d>0?'pos':d<0?'neg':'neu'}">${d>0?'+':''}${d}</td>`;
-}
-
-function numGrid(keys,sec){
-  return`<div class="grid2">${keys.map(({k,l,u})=>`
-    <div><label>${l}${u?` <span style="opacity:.55">${u}</span>`:''}</label>
-    <input type="number" step="0.1" value="${S.d[sec][k]}" placeholder="—" oninput="set('${sec}.${k}',this.value)"></div>
-  `).join('')}</div>`;
+function dCell(a, b) {
+  var d = dlt(a, b);
+  if (d === null) return '<td class="tg">—</td>';
+  var cls = d > 0 ? 'tp' : d < 0 ? 'tn' : 'tg';
+  return '<td class="' + cls + '">' + (d > 0 ? '+' : '') + d + '</td>';
 }
 
-function renderSetup(){
-  const d=S.d,ps=S.prevSession;
-  const showUpload=parseInt(d.sessionNum)>1;
-  return`
-  <div class="card">
-    <div class="sec-title">Session Details</div>
-    <div class="grid2">
-      <div><label>Session #</label><input type="number" value="${d.sessionNum}" min="1" oninput="set('sessionNum',this.value)"></div>
-      <div><label>Date</label><input type="date" value="${d.date}" oninput="set('date',this.value)"></div>
-      <div><label>Athlete Name</label><input type="text" value="${d.athlete}" placeholder="Full name" oninput="set('athlete',this.value)"></div>
-      <div><label>Trainer</label><input type="text" value="${d.trainer}" placeholder="Trainer name" oninput="set('trainer',this.value)"></div>
-      <div><label>Putter Type</label>
-        <select onchange="set('putterType',this.value)">
-          ${['Blade','Mallet','Other'].map(o=>`<option${d.putterType===o?' selected':''}>${o}</option>`).join('')}
-        </select>
-      </div>
-      <div><label>Handed</label>
-        <select onchange="set('handed',this.value)">
-          ${['Right','Left'].map(o=>`<option${d.handed===o?' selected':''}>${o}</option>`).join('')}
-        </select>
-      </div>
-      <div><label>Putt Length</label>
-        <div style="display:flex;gap:6px">
-          <input type="number" value="${d.puttLen}" placeholder="Length" oninput="set('puttLen',this.value)" style="flex:1">
-          <select onchange="set('puttUnit',this.value)" style="width:64px">
-            <option${d.puttUnit==='ft'?' selected':''}>ft</option>
-            <option${d.puttUnit==='m'?' selected':''}>m</option>
-          </select>
-        </div>
-      </div>
-      <div><label>Surface</label>
-        <select onchange="set('surface',this.value)">
-          ${['Indoor','Outdoor'].map(o=>`<option${d.surface===o?' selected':''}>${o}</option>`).join('')}
-        </select>
-      </div>
-      <div><label>Green Type</label>
-        <select onchange="set('green',this.value)">
-          ${['Artificial','Natural'].map(o=>`<option${d.green===o?' selected':''}>${o}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div><label>Session Goal</label><input type="text" value="${d.goal}" placeholder="e.g. Improve tempo consistency" oninput="set('goal',this.value)"></div>
-  </div>
-  ${showUpload?`
-  <div class="card" style="border-color:#ccd7f0">
-    <div class="sec-title">Compare with Previous Session</div>
-    <p style="font-size:13px;color:#666;margin-bottom:12px">Upload a previous session .json to add comparison columns to the report.</p>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <label class="file-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Upload Session File
-        <input type="file" accept=".json" style="display:none;width:auto" onchange="loadPrev(event)">
-      </label>
-      ${ps
-        ?`<span style="font-size:13px;color:#1a7a3b;font-weight:500">✓ Session ${ps.d?.sessionNum||'?'} loaded · ${ps.d?.athlete||''} · ${ps.d?.date||''}</span>`
-        :`<span style="font-size:13px;color:#999">No file loaded</span>`}
-    </div>
-  </div>`:''}`;
+function sel(name, path, opts, val) {
+  var html = '<select onchange="setD(\'' + path + '\',this.value)">';
+  for (var i = 0; i < opts.length; i++) {
+    html += '<option' + (val === opts[i] ? ' selected' : '') + '>' + opts[i] + '</option>';
+  }
+  html += '</select>';
+  return html;
 }
 
-function renderPutting(sec,title){
-  return`<div class="card">
-    <div class="sec-title">${title} — 10 Strokes</div>
-    ${numGrid(PUT_KEYS,sec)}
-  </div>`;
+function numInput(path, val) {
+  return '<input type="number" step="0.1" value="' + (val||'') + '" placeholder="—" oninput="setD(\'' + path + '\',this.value)">';
 }
 
-function renderMind(){
-  return`<div class="card">
-    <div class="sec-title">Mind Training — 12 Minutes</div>
-    ${numGrid(MIND_KEYS,'mind')}
-  </div>`;
+function numGrid(keys, sec) {
+  var html = '<div class="g2">';
+  for (var i = 0; i < keys.length; i++) {
+    var m = keys[i];
+    var lbl = m.l + (m.u ? ' <span style="opacity:.55;font-weight:400">' + m.u + '</span>' : '');
+    html += '<div><label class="field-label">' + lbl + '</label>' + numInput(sec + '.' + m.k, S.d[sec][m.k]) + '</div>';
+  }
+  html += '</div>';
+  return html;
 }
 
-function renderPostFG(){
-  return`${renderPutting('post','Post Putting')}
-  <div class="card">
-    <div class="sec-title">Performance Training — Focus Golf</div>
-    <p style="font-size:12px;color:#888;margin-bottom:14px;margin-top:-8px">Simultaneous with post putting · real-time biofeedback putting trigger</p>
-    ${numGrid(FG_KEYS,'fg')}
-  </div>`;
+function renderSetup() {
+  var d = S.d;
+  var showUpload = parseInt(d.num) > 1;
+  var ps = S.prevSession;
+  var html = '<div class="card">';
+  html += '<div class="sec-title">Session Details</div>';
+  html += '<div class="g2">';
+  html += '<div><label class="field-label">Session #</label><input type="number" min="1" value="' + d.num + '" oninput="setD(\'num\',this.value)"></div>';
+  html += '<div><label class="field-label">Date</label><input type="date" value="' + d.date + '" oninput="setD(\'date\',this.value)"></div>';
+  html += '<div><label class="field-label">Athlete Name</label><input type="text" value="' + d.athlete + '" placeholder="Full name" oninput="setD(\'athlete\',this.value)"></div>';
+  html += '<div><label class="field-label">Trainer</label><input type="text" value="' + d.trainer + '" placeholder="Trainer name" oninput="setD(\'trainer\',this.value)"></div>';
+  html += '<div><label class="field-label">Putter Type</label>' + sel('putterType','putterType',['Blade','Mallet','Other'],d.putterType) + '</div>';
+  html += '<div><label class="field-label">Handed</label>' + sel('handed','handed',['Right','Left'],d.handed) + '</div>';
+  html += '<div><label class="field-label">Putt Length</label><div style="display:flex;gap:6px"><input type="number" value="' + d.puttLen + '" placeholder="Length" oninput="setD(\'puttLen\',this.value)" style="flex:1">' + sel('puttUnit','puttUnit',['ft','m'],d.puttUnit).replace('width:100%','width:66px') + '</div></div>';
+  html += '<div><label class="field-label">Surface</label>' + sel('surface','surface',['Indoor','Outdoor'],d.surface) + '</div>';
+  html += '<div><label class="field-label">Green Type</label>' + sel('green','green',['Artificial','Natural'],d.green) + '</div>';
+  html += '</div>';
+  html += '<div><label class="field-label">Session Goal</label><input type="text" value="' + d.goal + '" placeholder="e.g. Improve tempo consistency" oninput="setD(\'goal\',this.value)"></div>';
+  html += '</div>';
+
+  if (showUpload) {
+    html += '<div class="card" style="border-color:#ccd7f0">';
+    html += '<div class="sec-title">Compare with Previous Session</div>';
+    html += '<p style="font-size:13px;color:#666;margin-bottom:12px">Upload a previous session .json to add comparison columns to the report.</p>';
+    html += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+    html += '<label class="upload-btn">Upload Session File<input type="file" accept=".json" style="display:none" onchange="loadPrev(event)"></label>';
+    if (ps) {
+      html += '<span style="font-size:13px;color:#1a7a3b;font-weight:600">Loaded: Session ' + (ps.d && ps.d.num || '?') + ' — ' + (ps.d && ps.d.athlete || '') + ' (' + (ps.d && ps.d.date || '') + ')</span>';
+    } else {
+      html += '<span style="font-size:13px;color:#aaa">No file loaded</span>';
+    }
+    html += '</div></div>';
+  }
+  return html;
 }
 
-function renderReport(){
-  const d=S.d;
-  const ps=S.prevSession?.d||null;
-  const hp=!!ps;
-
-  const putHead=hp
-    ?`<th class="c">S${ps.sessionNum} Pre</th><th class="c">Pre</th><th class="c">Post</th><th class="c">Pre→Post Δ</th><th class="c">vs S${ps.sessionNum} Δ</th>`
-    :`<th class="c">Pre</th><th class="c">Post</th><th class="c">Δ</th>`;
-  const cmpHead=hp
-    ?`<th class="c">Session ${ps.sessionNum}</th><th class="c">This Session</th><th class="c">Δ</th>`
-    :`<th class="c">Value</th>`;
-
-  const pRows=PUT_KEYS.map(({k,l,u},i)=>{
-    const bg=i%2?'#fafafa':'#fff';
-    const va=d.pre[k],vb=d.post[k];
-    let c=`<td style="font-weight:600">${l}</td>`;
-    if(hp)c+=`<td class="c" style="color:#999">${ps.pre?.[k]||'—'}${ps.pre?.[k]&&u?u:''}</td>`;
-    c+=`<td class="c">${va||'—'}${va&&u?u:''}</td>`;
-    c+=`<td class="c">${vb||'—'}${vb&&u?u:''}</td>`;
-    c+=dCell(vb,va);
-    if(hp)c+=dCell(vb,ps.post?.[k]);
-    return`<tr style="background:${bg}">${c}</tr>`;
-  }).join('');
-
-  const mRows=MIND_KEYS.map(({k,l,u},i)=>{
-    const bg=i%2?'#fafafa':'#fff';
-    const v=d.mind[k];
-    let c=`<td style="font-weight:600">${l}</td>`;
-    if(hp)c+=`<td class="c" style="color:#999">${ps.mind?.[k]||'—'}${ps.mind?.[k]&&u?u:''}</td>`;
-    c+=`<td class="c">${v||'—'}${v&&u?u:''}</td>`;
-    if(hp)c+=dCell(v,ps.mind?.[k]);
-    return`<tr style="background:${bg}">${c}</tr>`;
-  }).join('');
-
-  const fRows=FG_KEYS.map(({k,l,u},i)=>{
-    const bg=i%2?'#fafafa':'#fff';
-    const v=d.fg[k];
-    let c=`<td style="font-weight:600">${l}</td>`;
-    if(hp)c+=`<td class="c" style="color:#999">${ps.fg?.[k]||'—'}${ps.fg?.[k]&&u?u:''}</td>`;
-    c+=`<td class="c">${v||'—'}${v&&u?u:''}</td>`;
-    if(hp)c+=dCell(v,ps.fg?.[k]);
-    return`<tr style="background:${bg}">${c}</tr>`;
-  }).join('');
-
-  return`
-  <div class="card" style="border-left:4px solid ${B}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="font-size:22px;font-weight:700;color:#1a1a1a">${d.athlete||'Athlete'}</div>
-        <div style="font-size:13px;color:#888;margin-top:2px">Session #${d.sessionNum} · ${d.date} · Trainer: ${d.trainer||'—'}</div>
-      </div>
-      <div class="meta-chips">
-        ${[['Putter',d.putterType],['Handed',d.handed],['Length',d.puttLen?d.puttLen+d.puttUnit:'—'],['Surface',d.surface+'/'+d.green]].map(([l,v])=>
-          `<div class="chip"><span class="chip-label">${l}</span><span class="chip-val">${v}</span></div>`).join('')}
-      </div>
-    </div>
-    ${d.goal?`<div style="font-size:13px;color:#666;margin-top:10px">Goal: ${d.goal}</div>`:''}
-  </div>
-
-  <div style="font-size:15px;font-weight:600;margin-bottom:10px">Putting Performance</div>
-  <div class="tbl-wrap">
-    <table><thead><tr><th>Metric</th>${putHead}</tr></thead><tbody>${pRows}</tbody></table>
-  </div>
-
-  <div style="font-size:15px;font-weight:600;margin-bottom:10px">Mind Training — 12 Minutes</div>
-  <div class="tbl-wrap">
-    <table><thead><tr><th>Metric</th>${cmpHead}</tr></thead><tbody>${mRows}</tbody></table>
-  </div>
-
-  <div style="font-size:15px;font-weight:600;margin-bottom:4px">Performance Training — Focus Golf</div>
-  <div style="font-size:12px;color:#888;margin-bottom:10px">Real-time biofeedback putting trigger · simultaneous with post putting</div>
-  <div class="tbl-wrap">
-    <table><thead><tr><th>Metric</th>${cmpHead}</tr></thead><tbody>${fRows}</tbody></table>
-  </div>
-
-  <div class="summary-box">
-    <div style="font-size:11px;font-weight:600;color:${B};text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Session Summary</div>
-    <textarea rows="6" placeholder="Write your session notes and recommendations here..." oninput="setSt('summary',this.value)">${S.summary}</textarea>
-
-  </div>
-
-  <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap" class="no-print">
-    <button onclick="dlJSON()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:5px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Save Session JSON
-    </button>
-    <button onclick="window.print()" class="btn-p">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="vertical-align:-1px;margin-right:5px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      Print / Export PDF
-    </button>
-  </div>`;
+function renderPutting(sec, title) {
+  return '<div class="card"><div class="sec-title">' + title + ' — 10 Strokes</div>' + numGrid(PUT_KEYS, sec) + '</div>';
 }
 
-function render(){
-const s=S.step;
-let content=’’;
-if(s===0)content=renderSetup();
-else if(s===1)content=renderPutting(‘pre’,‘Pre Putting’);
-else if(s===2)content=renderMind();
-else if(s===3)content=renderPostFG();
-else content=renderReport();
-
-const nav=s<4
-?`<div class="nav ${s>0?'spread':'right'} no-print"> ${s>0?`<button onclick="go(-1)">← Back</button>`:''} <button class="btn-p" onclick="go(1)">${s===3?'Generate Report →':'Next →'}</button> </div>`
-:`<div class="nav no-print"><button onclick="go(-4)">← Start New Session</button></div>`;
-
-const progress=`
-
-  <div class="progress no-print">
-    ${STEPS.map((name,i)=>`
-      <div class="prog-item">
-        <div class="prog-bar" style="background:${i<=s?B:'#e0e0e0'}"></div>
-        <div class="prog-label" style="color:${i===s?B:'#aaa'}">${name}</div>
-      </div>`).join('')}
-  </div>`;
-
-document.getElementById(‘app’).innerHTML=progress+content+nav;
+function renderMind() {
+  return '<div class="card"><div class="sec-title">Mind Training — 12 Minutes</div>' + numGrid(MIND_KEYS, 'mind') + '</div>';
 }
 
-function go(n){
-S.step=n===-4?0:Math.max(0,Math.min(4,S.step+n));
-render();
+function renderPostFG() {
+  var html = renderPutting('post', 'Post Putting');
+  html += '<div class="card"><div class="sec-title">Performance Training — Focus Golf</div>';
+  html += '<p style="font-size:12px;color:#888;margin-top:-8px;margin-bottom:14px">Simultaneous with post putting — real-time biofeedback putting trigger</p>';
+  html += numGrid(FG_KEYS, 'fg') + '</div>';
+  return html;
 }
 
-function loadPrev(e){
-const f=e.target.files[0];if(!f)return;
-const r=new FileReader();
-r.onload=ev=>{
-try{S.prevSession=JSON.parse(ev.target.result);render();}
-catch{alert(‘Invalid session file — make sure you're uploading a Thrive session .json’);}
-};
-r.readAsText(f);
+function renderReport() {
+  var d = S.d;
+  var ps = S.prevSession && S.prevSession.d ? S.prevSession.d : null;
+  var hp = !!ps;
+
+  // Header card
+  var html = '<div class="card" style="border-left:4px solid #003DA5">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">';
+  html += '<div><div style="font-size:22px;font-weight:700">' + (d.athlete || 'Athlete') + '</div>';
+  html += '<div style="font-size:13px;color:#888;margin-top:2px">Session #' + d.num + ' &middot; ' + d.date + ' &middot; Trainer: ' + (d.trainer || '—') + '</div></div>';
+  html += '<div class="chip-row">';
+  var chips = [['Putter', d.putterType], ['Handed', d.handed], ['Length', d.puttLen ? d.puttLen + d.puttUnit : '—'], ['Surface', d.surface + '/' + d.green]];
+  for (var i = 0; i < chips.length; i++) {
+    html += '<div class="chip"><span class="cl">' + chips[i][0] + '</span><span class="cv">' + chips[i][1] + '</span></div>';
+  }
+  html += '</div></div>';
+  if (d.goal) html += '<div style="font-size:13px;color:#666;margin-top:10px">Goal: ' + d.goal + '</div>';
+  html += '</div>';
+
+  // Putting table
+  html += '<div style="font-size:15px;font-weight:700;margin-bottom:10px">Putting Performance</div>';
+  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if (hp) html += '<th class="c">S' + ps.num + ' Pre</th>';
+  html += '<th class="c">Pre</th><th class="c">Post</th><th class="c">Pre&rarr;Post</th>';
+  if (hp) html += '<th class="c">vs S' + ps.num + ' Post</th>';
+  html += '</tr></thead><tbody>';
+  for (var i = 0; i < PUT_KEYS.length; i++) {
+    var m = PUT_KEYS[i];
+    var va = d.pre[m.k], vb = d.post[m.k];
+    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
+    if (hp) html += '<td class="tg">' + (ps.pre && ps.pre[m.k] ? ps.pre[m.k] + m.u : '—') + '</td>';
+    html += '<td class="tc">' + (va ? va + m.u : '—') + '</td>';
+    html += '<td class="tc">' + (vb ? vb + m.u : '—') + '</td>';
+    html += dCell(vb, va);
+    if (hp) html += dCell(vb, ps.post && ps.post[m.k]);
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+
+  // Mind training table
+  html += '<div style="font-size:15px;font-weight:700;margin-bottom:10px">Mind Training — 12 Minutes</div>';
+  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if (hp) html += '<th class="c">Session ' + ps.num + '</th>';
+  html += '<th class="c">This Session</th>';
+  if (hp) html += '<th class="c">&Delta;</th>';
+  html += '</tr></thead><tbody>';
+  for (var i = 0; i < MIND_KEYS.length; i++) {
+    var m = MIND_KEYS[i];
+    var v = d.mind[m.k];
+    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
+    if (hp) html += '<td class="tg">' + (ps.mind && ps.mind[m.k] ? ps.mind[m.k] + m.u : '—') + '</td>';
+    html += '<td class="tc">' + (v ? v + m.u : '—') + '</td>';
+    if (hp) html += dCell(v, ps.mind && ps.mind[m.k]);
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+
+  // Focus Golf table
+  html += '<div style="font-size:15px;font-weight:700;margin-bottom:4px">Performance Training — Focus Golf</div>';
+  html += '<div style="font-size:12px;color:#888;margin-bottom:10px">Real-time biofeedback putting trigger &middot; simultaneous with post putting</div>';
+  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if (hp) html += '<th class="c">Session ' + ps.num + '</th>';
+  html += '<th class="c">This Session</th>';
+  if (hp) html += '<th class="c">&Delta;</th>';
+  html += '</tr></thead><tbody>';
+  for (var i = 0; i < FG_KEYS.length; i++) {
+    var m = FG_KEYS[i];
+    var v = d.fg[m.k];
+    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
+    if (hp) html += '<td class="tg">' + (ps.fg && ps.fg[m.k] ? ps.fg[m.k] + m.u : '—') + '</td>';
+    html += '<td class="tc">' + (v ? v + m.u : '—') + '</td>';
+    if (hp) html += dCell(v, ps.fg && ps.fg[m.k]);
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+
+  // Summary
+  html += '<div class="card" style="background:#f7f9ff;border-color:#ccd7f0;margin-bottom:20px">';
+  html += '<div class="sec-title">Session Summary</div>';
+  html += '<textarea rows="6" placeholder="Write your session notes and recommendations here..." oninput="setSt(\'summary\',this.value)">' + (S.summary || '') + '</textarea>';
+  html += '</div>';
+
+  // Actions
+  html += '<div class="nav fe no-print">';
+  html += '<button onclick="dlJSON()">Save Session JSON</button>';
+  html += '<button class="btn-p" onclick="window.print()">Print / Export PDF</button>';
+  html += '</div>';
+
+  return html;
 }
 
-function dlJSON(){
-const payload={d:S.d,summary:S.summary};
-const blob=new Blob([JSON.stringify(payload,null,2)],{type:‘application/json’});
-const a=document.createElement(‘a’);
-a.href=URL.createObjectURL(blob);
-a.download=`thrive_s${S.d.sessionNum}_${(S.d.athlete||'athlete').replace(/\s+/g,'_')}_${S.d.date}.json`;
-a.click();
+function render() {
+  try {
+    var s = S.step;
+    var content = '';
+    if (s === 0) content = renderSetup();
+    else if (s === 1) content = renderPutting('pre', 'Pre Putting');
+    else if (s === 2) content = renderMind();
+    else if (s === 3) content = renderPostFG();
+    else content = renderReport();
+
+    var nav = '';
+    if (s < 4) {
+      nav = '<div class="nav ' + (s > 0 ? 'sb' : 'fe') + ' no-print">';
+      if (s > 0) nav += '<button onclick="go(-1)">← Back</button>';
+      nav += '<button class="btn-p" onclick="go(1)">' + (s === 3 ? 'Generate Report →' : 'Next →') + '</button>';
+      nav += '</div>';
+    } else {
+      nav = '<div class="nav no-print"><button onclick="go(-4)">← Start New Session</button></div>';
+    }
+
+    var progress = '<div class="prog no-print">';
+    for (var i = 0; i < STEPS.length; i++) {
+      var active = i <= s;
+      var current = i === s;
+      progress += '<div class="pi">';
+      progress += '<div class="pb" style="background:' + (active ? B : '#ddd') + '"></div>';
+      progress += '<div class="pl" style="color:' + (current ? B : '#bbb') + '">' + STEPS[i] + '</div>';
+      progress += '</div>';
+    }
+    progress += '</div>';
+
+    var el = document.getElementById('app');
+    el.innerHTML = progress + content + nav;
+  } catch(e) {
+    document.getElementById('app').innerHTML = '<div style="padding:20px;color:#b83232;background:#fff;border-radius:8px;border:1px solid #f0c0c0"><strong>Error loading app:</strong><br>' + e.message + '</div>';
+  }
 }
 
-render();
+function go(n) {
+  S.step = n === -4 ? 0 : Math.max(0, Math.min(4, S.step + n));
+  render();
+}
+
+function loadPrev(e) {
+  var f = e.target.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    try {
+      S.prevSession = JSON.parse(ev.target.result);
+      render();
+    } catch(err) {
+      alert('Invalid session file. Please upload a Thrive session .json file.');
+    }
+  };
+  r.readAsText(f);
+}
+
+function dlJSON() {
+  var payload = { d: S.d, summary: S.summary };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  var name = 'thrive_s' + S.d.num + '_' + (S.d.athlete || 'athlete').replace(/\s+/g,'_') + '_' + S.d.date + '.json';
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  render();
+});
 </script>
-
 </body>
 </html>
