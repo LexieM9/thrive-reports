@@ -15,35 +15,34 @@ textarea{resize:vertical;line-height:1.6}
 button{font-family:inherit;font-size:14px;padding:10px 18px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:active{opacity:0.8}
 .btn-p{background:#003DA5;color:#fff;border-color:#003DA5;font-weight:600}
-label.field-label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:600;letter-spacing:0.02em}
+label.fl{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:600;letter-spacing:0.02em}
 .card{background:#fff;border:1px solid #e4e4e4;border-radius:12px;padding:1.25rem;margin-bottom:14px}
-.sec-title{font-size:11px;font-weight:700;color:#003DA5;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
+.st{font-size:11px;font-weight:700;color:#003DA5;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{font-size:11px;font-weight:700;padding:9px 10px;text-align:left;background:#003DA5;color:#fff;letter-spacing:0.04em}
-th.c{text-align:center}
+th.c,td.c{text-align:center}
 td{padding:9px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:nth-child(even){background:#fafafa}
-.tc{text-align:center}
 .tp{color:#1a7a3b;font-weight:700;text-align:center}
 .tn{color:#b83232;font-weight:700;text-align:center}
 .tg{color:#999;text-align:center}
 .tbw{overflow-x:auto;margin-bottom:22px;border-radius:8px;border:1px solid #e4e4e4}
 .prog{display:flex;gap:3px;margin-bottom:22px}
 .pi{flex:1;text-align:center}
-.pb{height:3px;border-radius:2px;margin-bottom:5px}
+.pb{height:3px;border-radius:2px;margin-bottom:5px;transition:background .2s}
 .pl{font-size:10px;font-weight:600}
-.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
 .chip{background:#eef3fc;border-radius:8px;padding:5px 11px}
 .cl{font-size:10px;color:#003DA5;text-transform:uppercase;letter-spacing:0.05em;display:block;font-weight:600}
 .cv{font-size:12px;font-weight:700;color:#1a1a1a}
-.upload-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:9px 16px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-weight:500}
 .nav{display:flex;margin-top:20px;gap:10px}
-.nav.sb{justify-content:space-between}
-.nav.fe{justify-content:flex-end}
+.sb{justify-content:space-between}
+.fe{justify-content:flex-end}
+.ul{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:9px 16px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-weight:500}
 @media(max-width:480px){.g2{grid-template-columns:1fr}}
-@media print{.no-print{display:none!important}body{background:#fff}.card{box-shadow:none}}
+@media print{.no-print{display:none!important}body{background:#fff}}
 </style>
 </head>
 <body>
@@ -57,13 +56,10 @@ tr:nth-child(even){background:#fafafa}
       <div style="font-size:11px;color:#888">Session Report Generator</div>
     </div>
   </div>
-  <div id="app"><p style="color:#888;padding:20px">Loading...</p></div>
+  <div id="app"></div>
 </div>
 
 <script>
-var B = '#003DA5';
-var STEPS = ['Setup', 'Pre Putting', 'Mind Training', 'Post + Focus Golf', 'Report'];
-
 var PUT_KEYS = [
   {k:'score',    l:'Total Score',  u:'/100'},
   {k:'face',     l:'Face Change',  u:'%'},
@@ -75,14 +71,14 @@ var PUT_KEYS = [
   {k:'handling', l:'Handling',     u:'%'}
 ];
 var MIND_KEYS = [
-  {k:'rr',       l:'Earned Reward Rate',       u:'%'},
-  {k:'avgR',     l:'Avg Reward Duration',       u:'s'},
-  {k:'longR',    l:'Longest Reward',            u:'s'},
-  {k:'peakCalm', l:'Peak Calm Focus',           u:''},
-  {k:'focusPct', l:'Focus %',                   u:'%'},
-  {k:'calmPct',  l:'Calm %',                    u:'%'},
-  {k:'stress',   l:'Resist Stress',             u:'%'},
-  {k:'fatigue',  l:'Resist Fatigue',            u:'%'}
+  {k:'rr',       l:'Earned Reward Rate',  u:'%'},
+  {k:'avgR',     l:'Avg Reward Duration', u:'s'},
+  {k:'longR',    l:'Longest Reward',      u:'s'},
+  {k:'peakCalm', l:'Peak Calm Focus',     u:''},
+  {k:'focusPct', l:'Focus %',             u:'%'},
+  {k:'calmPct',  l:'Calm %',              u:'%'},
+  {k:'stress',   l:'Resist Stress',       u:'%'},
+  {k:'fatigue',  l:'Resist Fatigue',      u:'%'}
 ];
 var FG_KEYS = [
   {k:'rr',       l:'Earned Reward Rate',  u:'%'},
@@ -91,291 +87,308 @@ var FG_KEYS = [
   {k:'peakCalm', l:'Peak Calm Focus',     u:''}
 ];
 
-function emptyObj(keys) {
-  var o = {};
-  for (var i = 0; i < keys.length; i++) o[keys[i].k] = '';
-  return o;
-}
+function emptyObj(keys){ var o={}; for(var i=0;i<keys.length;i++) o[keys[i].k]=''; return o; }
 
 var S = {
-  step: 0,
-  summary: '',
-  prevSession: null,
-  d: {
-    num: '1',
-    date: new Date().toISOString().slice(0,10),
-    athlete: '', trainer: '',
-    putterType: 'Blade', handed: 'Right',
-    puttLen: '', puttUnit: 'ft',
-    surface: 'Indoor', green: 'Artificial',
-    goal: '',
-    pre:  emptyObj(PUT_KEYS),
-    mind: emptyObj(MIND_KEYS),
-    post: emptyObj(PUT_KEYS),
-    fg:   emptyObj(FG_KEYS)
+  step:0, summary:'', prevSession:null,
+  d:{
+    num:'1', date:new Date().toISOString().slice(0,10),
+    athlete:'', trainer:'', putterType:'Blade', handed:'Right',
+    puttLen:'', puttUnit:'ft', surface:'Indoor', green:'Artificial', goal:'',
+    pre:emptyObj(PUT_KEYS), mind:emptyObj(MIND_KEYS),
+    post:emptyObj(PUT_KEYS), fg:emptyObj(FG_KEYS)
   }
 };
 
-function setD(path, val) {
+/* ── state helpers ─────────────────────────────────────────────
+   updateD  : update state only — no re-render (safe to call from oninput)
+   setAndRender : update + re-render (for selects / session # change)
+──────────────────────────────────────────────────────────────── */
+function updateD(path, val) {
   var p = path.split('.');
-  if (p.length === 1) { S.d[p[0]] = val; }
-  else { S.d[p[0]][p[1]] = val; }
+  if(p.length===1) S.d[p[0]]=val;
+  else S.d[p[0]][p[1]]=val;
+}
+function setAndRender(path, val) {
+  updateD(path, val);
   render();
 }
-function setSt(k, v) { S[k] = v; render(); }
 
-function dlt(a, b) {
-  var x = parseFloat(a), y = parseFloat(b);
-  if (isNaN(x) || isNaN(y)) return null;
-  return Math.round((x - y) * 10) / 10;
-}
-function dCell(a, b) {
-  var d = dlt(a, b);
-  if (d === null) return '<td class="tg">—</td>';
-  var cls = d > 0 ? 'tp' : d < 0 ? 'tn' : 'tg';
-  return '<td class="' + cls + '">' + (d > 0 ? '+' : '') + d + '</td>';
-}
-
-function sel(name, path, opts, val) {
-  var html = '<select onchange="setD(\'' + path + '\',this.value)">';
-  for (var i = 0; i < opts.length; i++) {
-    html += '<option' + (val === opts[i] ? ' selected' : '') + '>' + opts[i] + '</option>';
-  }
-  html += '</select>';
-  return html;
-}
-
-function numInput(path, val) {
-  return '<input type="number" step="0.1" value="' + (val||'') + '" placeholder="—" oninput="setD(\'' + path + '\',this.value)">';
-}
-
-function numGrid(keys, sec) {
-  var html = '<div class="g2">';
-  for (var i = 0; i < keys.length; i++) {
-    var m = keys[i];
-    var lbl = m.l + (m.u ? ' <span style="opacity:.55;font-weight:400">' + m.u + '</span>' : '');
-    html += '<div><label class="field-label">' + lbl + '</label>' + numInput(sec + '.' + m.k, S.d[sec][m.k]) + '</div>';
-  }
-  html += '</div>';
-  return html;
-}
-
-function renderSetup() {
-  var d = S.d;
-  var showUpload = parseInt(d.num) > 1;
-  var ps = S.prevSession;
-  var html = '<div class="card">';
-  html += '<div class="sec-title">Session Details</div>';
-  html += '<div class="g2">';
-  html += '<div><label class="field-label">Session #</label><input type="number" min="1" value="' + d.num + '" oninput="setD(\'num\',this.value)"></div>';
-  html += '<div><label class="field-label">Date</label><input type="date" value="' + d.date + '" oninput="setD(\'date\',this.value)"></div>';
-  html += '<div><label class="field-label">Athlete Name</label><input type="text" value="' + d.athlete + '" placeholder="Full name" oninput="setD(\'athlete\',this.value)"></div>';
-  html += '<div><label class="field-label">Trainer</label><input type="text" value="' + d.trainer + '" placeholder="Trainer name" oninput="setD(\'trainer\',this.value)"></div>';
-  html += '<div><label class="field-label">Putter Type</label>' + sel('putterType','putterType',['Blade','Mallet','Other'],d.putterType) + '</div>';
-  html += '<div><label class="field-label">Handed</label>' + sel('handed','handed',['Right','Left'],d.handed) + '</div>';
-  html += '<div><label class="field-label">Putt Length</label><div style="display:flex;gap:6px"><input type="number" value="' + d.puttLen + '" placeholder="Length" oninput="setD(\'puttLen\',this.value)" style="flex:1">' + sel('puttUnit','puttUnit',['ft','m'],d.puttUnit).replace('width:100%','width:66px') + '</div></div>';
-  html += '<div><label class="field-label">Surface</label>' + sel('surface','surface',['Indoor','Outdoor'],d.surface) + '</div>';
-  html += '<div><label class="field-label">Green Type</label>' + sel('green','green',['Artificial','Natural'],d.green) + '</div>';
-  html += '</div>';
-  html += '<div><label class="field-label">Session Goal</label><input type="text" value="' + d.goal + '" placeholder="e.g. Improve tempo consistency" oninput="setD(\'goal\',this.value)"></div>';
-  html += '</div>';
-
-  if (showUpload) {
-    html += '<div class="card" style="border-color:#ccd7f0">';
-    html += '<div class="sec-title">Compare with Previous Session</div>';
-    html += '<p style="font-size:13px;color:#666;margin-bottom:12px">Upload a previous session .json to add comparison columns to the report.</p>';
-    html += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
-    html += '<label class="upload-btn">Upload Session File<input type="file" accept=".json" style="display:none" onchange="loadPrev(event)"></label>';
-    if (ps) {
-      html += '<span style="font-size:13px;color:#1a7a3b;font-weight:600">Loaded: Session ' + (ps.d && ps.d.num || '?') + ' — ' + (ps.d && ps.d.athlete || '') + ' (' + (ps.d && ps.d.date || '') + ')</span>';
-    } else {
-      html += '<span style="font-size:13px;color:#aaa">No file loaded</span>';
+/* ── collect all visible inputs before navigating ────────────── */
+function collectStep(s) {
+  var ids, i, el;
+  if(s===0) {
+    ids=['num','date','athlete','trainer','puttLen','goal'];
+    for(i=0;i<ids.length;i++){
+      el=document.getElementById('f_'+ids[i]);
+      if(el) updateD(ids[i], el.value);
     }
-    html += '</div></div>';
+  } else if(s===1) {
+    collectSection(PUT_KEYS,'pre');
+  } else if(s===2) {
+    collectSection(MIND_KEYS,'mind');
+  } else if(s===3) {
+    collectSection(PUT_KEYS,'post');
+    collectSection(FG_KEYS,'fg');
+  } else if(s===4) {
+    el=document.getElementById('f_summary');
+    if(el) S.summary=el.value;
   }
-  return html;
 }
-
-function renderPutting(sec, title) {
-  return '<div class="card"><div class="sec-title">' + title + ' — 10 Strokes</div>' + numGrid(PUT_KEYS, sec) + '</div>';
-}
-
-function renderMind() {
-  return '<div class="card"><div class="sec-title">Mind Training — 12 Minutes</div>' + numGrid(MIND_KEYS, 'mind') + '</div>';
-}
-
-function renderPostFG() {
-  var html = renderPutting('post', 'Post Putting');
-  html += '<div class="card"><div class="sec-title">Performance Training — Focus Golf</div>';
-  html += '<p style="font-size:12px;color:#888;margin-top:-8px;margin-bottom:14px">Simultaneous with post putting — real-time biofeedback putting trigger</p>';
-  html += numGrid(FG_KEYS, 'fg') + '</div>';
-  return html;
-}
-
-function renderReport() {
-  var d = S.d;
-  var ps = S.prevSession && S.prevSession.d ? S.prevSession.d : null;
-  var hp = !!ps;
-
-  // Header card
-  var html = '<div class="card" style="border-left:4px solid #003DA5">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">';
-  html += '<div><div style="font-size:22px;font-weight:700">' + (d.athlete || 'Athlete') + '</div>';
-  html += '<div style="font-size:13px;color:#888;margin-top:2px">Session #' + d.num + ' &middot; ' + d.date + ' &middot; Trainer: ' + (d.trainer || '—') + '</div></div>';
-  html += '<div class="chip-row">';
-  var chips = [['Putter', d.putterType], ['Handed', d.handed], ['Length', d.puttLen ? d.puttLen + d.puttUnit : '—'], ['Surface', d.surface + '/' + d.green]];
-  for (var i = 0; i < chips.length; i++) {
-    html += '<div class="chip"><span class="cl">' + chips[i][0] + '</span><span class="cv">' + chips[i][1] + '</span></div>';
-  }
-  html += '</div></div>';
-  if (d.goal) html += '<div style="font-size:13px;color:#666;margin-top:10px">Goal: ' + d.goal + '</div>';
-  html += '</div>';
-
-  // Putting table
-  html += '<div style="font-size:15px;font-weight:700;margin-bottom:10px">Putting Performance</div>';
-  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
-  if (hp) html += '<th class="c">S' + ps.num + ' Pre</th>';
-  html += '<th class="c">Pre</th><th class="c">Post</th><th class="c">Pre&rarr;Post</th>';
-  if (hp) html += '<th class="c">vs S' + ps.num + ' Post</th>';
-  html += '</tr></thead><tbody>';
-  for (var i = 0; i < PUT_KEYS.length; i++) {
-    var m = PUT_KEYS[i];
-    var va = d.pre[m.k], vb = d.post[m.k];
-    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
-    if (hp) html += '<td class="tg">' + (ps.pre && ps.pre[m.k] ? ps.pre[m.k] + m.u : '—') + '</td>';
-    html += '<td class="tc">' + (va ? va + m.u : '—') + '</td>';
-    html += '<td class="tc">' + (vb ? vb + m.u : '—') + '</td>';
-    html += dCell(vb, va);
-    if (hp) html += dCell(vb, ps.post && ps.post[m.k]);
-    html += '</tr>';
-  }
-  html += '</tbody></table></div>';
-
-  // Mind training table
-  html += '<div style="font-size:15px;font-weight:700;margin-bottom:10px">Mind Training — 12 Minutes</div>';
-  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
-  if (hp) html += '<th class="c">Session ' + ps.num + '</th>';
-  html += '<th class="c">This Session</th>';
-  if (hp) html += '<th class="c">&Delta;</th>';
-  html += '</tr></thead><tbody>';
-  for (var i = 0; i < MIND_KEYS.length; i++) {
-    var m = MIND_KEYS[i];
-    var v = d.mind[m.k];
-    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
-    if (hp) html += '<td class="tg">' + (ps.mind && ps.mind[m.k] ? ps.mind[m.k] + m.u : '—') + '</td>';
-    html += '<td class="tc">' + (v ? v + m.u : '—') + '</td>';
-    if (hp) html += dCell(v, ps.mind && ps.mind[m.k]);
-    html += '</tr>';
-  }
-  html += '</tbody></table></div>';
-
-  // Focus Golf table
-  html += '<div style="font-size:15px;font-weight:700;margin-bottom:4px">Performance Training — Focus Golf</div>';
-  html += '<div style="font-size:12px;color:#888;margin-bottom:10px">Real-time biofeedback putting trigger &middot; simultaneous with post putting</div>';
-  html += '<div class="tbw"><table><thead><tr><th>Metric</th>';
-  if (hp) html += '<th class="c">Session ' + ps.num + '</th>';
-  html += '<th class="c">This Session</th>';
-  if (hp) html += '<th class="c">&Delta;</th>';
-  html += '</tr></thead><tbody>';
-  for (var i = 0; i < FG_KEYS.length; i++) {
-    var m = FG_KEYS[i];
-    var v = d.fg[m.k];
-    html += '<tr><td style="font-weight:600">' + m.l + '</td>';
-    if (hp) html += '<td class="tg">' + (ps.fg && ps.fg[m.k] ? ps.fg[m.k] + m.u : '—') + '</td>';
-    html += '<td class="tc">' + (v ? v + m.u : '—') + '</td>';
-    if (hp) html += dCell(v, ps.fg && ps.fg[m.k]);
-    html += '</tr>';
-  }
-  html += '</tbody></table></div>';
-
-  // Summary
-  html += '<div class="card" style="background:#f7f9ff;border-color:#ccd7f0;margin-bottom:20px">';
-  html += '<div class="sec-title">Session Summary</div>';
-  html += '<textarea rows="6" placeholder="Write your session notes and recommendations here..." oninput="setSt(\'summary\',this.value)">' + (S.summary || '') + '</textarea>';
-  html += '</div>';
-
-  // Actions
-  html += '<div class="nav fe no-print">';
-  html += '<button onclick="dlJSON()">Save Session JSON</button>';
-  html += '<button class="btn-p" onclick="window.print()">Print / Export PDF</button>';
-  html += '</div>';
-
-  return html;
-}
-
-function render() {
-  try {
-    var s = S.step;
-    var content = '';
-    if (s === 0) content = renderSetup();
-    else if (s === 1) content = renderPutting('pre', 'Pre Putting');
-    else if (s === 2) content = renderMind();
-    else if (s === 3) content = renderPostFG();
-    else content = renderReport();
-
-    var nav = '';
-    if (s < 4) {
-      nav = '<div class="nav ' + (s > 0 ? 'sb' : 'fe') + ' no-print">';
-      if (s > 0) nav += '<button onclick="go(-1)">← Back</button>';
-      nav += '<button class="btn-p" onclick="go(1)">' + (s === 3 ? 'Generate Report →' : 'Next →') + '</button>';
-      nav += '</div>';
-    } else {
-      nav = '<div class="nav no-print"><button onclick="go(-4)">← Start New Session</button></div>';
-    }
-
-    var progress = '<div class="prog no-print">';
-    for (var i = 0; i < STEPS.length; i++) {
-      var active = i <= s;
-      var current = i === s;
-      progress += '<div class="pi">';
-      progress += '<div class="pb" style="background:' + (active ? B : '#ddd') + '"></div>';
-      progress += '<div class="pl" style="color:' + (current ? B : '#bbb') + '">' + STEPS[i] + '</div>';
-      progress += '</div>';
-    }
-    progress += '</div>';
-
-    var el = document.getElementById('app');
-    el.innerHTML = progress + content + nav;
-  } catch(e) {
-    document.getElementById('app').innerHTML = '<div style="padding:20px;color:#b83232;background:#fff;border-radius:8px;border:1px solid #f0c0c0"><strong>Error loading app:</strong><br>' + e.message + '</div>';
+function collectSection(keys, sec) {
+  for(var i=0;i<keys.length;i++){
+    var el=document.getElementById('f_'+sec+'_'+keys[i].k);
+    if(el) updateD(sec+'.'+keys[i].k, el.value);
   }
 }
 
 function go(n) {
-  S.step = n === -4 ? 0 : Math.max(0, Math.min(4, S.step + n));
+  collectStep(S.step);
+  S.step = n===-4 ? 0 : Math.max(0, Math.min(4, S.step+n));
   render();
+  window.scrollTo(0,0);
 }
 
-function loadPrev(e) {
-  var f = e.target.files[0];
-  if (!f) return;
-  var r = new FileReader();
-  r.onload = function(ev) {
-    try {
-      S.prevSession = JSON.parse(ev.target.result);
-      render();
-    } catch(err) {
-      alert('Invalid session file. Please upload a Thrive session .json file.');
+/* ── delta helpers ───────────────────────────────────────────── */
+function dlt(a,b){
+  var x=parseFloat(a), y=parseFloat(b);
+  if(isNaN(x)||isNaN(y)) return null;
+  return Math.round((x-y)*10)/10;
+}
+function dCell(a,b){
+  var d=dlt(a,b);
+  if(d===null) return '<td class="tg">—</td>';
+  var cls=d>0?'tp':d<0?'tn':'tg';
+  return '<td class="'+cls+'">'+(d>0?'+':'')+d+'</td>';
+}
+
+/* ── input builders ──────────────────────────────────────────── */
+function mkSel(path, opts, val, extraStyle) {
+  var s='<select onchange="setAndRender(\''+path+'\',this.value)"';
+  if(extraStyle) s+=' style="'+extraStyle+'"';
+  s+='>';
+  for(var i=0;i<opts.length;i++)
+    s+='<option'+(val===opts[i]?' selected':'')+'>'+opts[i]+'</option>';
+  s+='</select>';
+  return s;
+}
+function mkNum(id, val) {
+  /* plain number input — no oninput/onchange, collected on navigation */
+  return '<input type="number" id="'+id+'" step="0.1" value="'+(val||'')+'" placeholder="—">';
+}
+function mkText(id, val, placeholder) {
+  return '<input type="text" id="'+id+'" value="'+(val||'')+'" placeholder="'+(placeholder||'')+'">';
+}
+
+function numGrid(keys, sec) {
+  var h='<div class="g2">';
+  for(var i=0;i<keys.length;i++){
+    var m=keys[i];
+    var lbl=m.l+(m.u?' <span style="opacity:.5;font-weight:400">'+m.u+'</span>':'');
+    h+='<div><label class="fl">'+lbl+'</label>'+mkNum('f_'+sec+'_'+m.k, S.d[sec][m.k])+'</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ── step renderers ──────────────────────────────────────────── */
+function renderSetup(){
+  var d=S.d, ps=S.prevSession;
+  var showUpload=parseInt(d.num)>1;
+  var h='<div class="card">';
+  h+='<div class="st">Session Details</div>';
+  h+='<div class="g2">';
+  h+='<div><label class="fl">Session #</label><input type="number" id="f_num" min="1" value="'+d.num+'" onchange="setAndRender(\'num\',this.value)"></div>';
+  h+='<div><label class="fl">Date</label><input type="date" id="f_date" value="'+d.date+'"></div>';
+  h+='<div><label class="fl">Athlete Name</label>'+mkText('f_athlete',d.athlete,'Full name')+'</div>';
+  h+='<div><label class="fl">Trainer</label>'+mkText('f_trainer',d.trainer,'Trainer name')+'</div>';
+  h+='<div><label class="fl">Putter Type</label>'+mkSel('putterType',['Blade','Mallet','Other'],d.putterType)+'</div>';
+  h+='<div><label class="fl">Handed</label>'+mkSel('handed',['Right','Left'],d.handed)+'</div>';
+  h+='<div><label class="fl">Putt Length</label>';
+  h+='<div style="display:flex;gap:6px">';
+  h+='<input type="number" id="f_puttLen" value="'+(d.puttLen||'')+'" placeholder="Length" style="flex:1;min-width:0">';
+  h+=mkSel('puttUnit',['ft','m'],d.puttUnit,'width:70px;flex-shrink:0');
+  h+='</div></div>';
+  h+='<div><label class="fl">Surface</label>'+mkSel('surface',['Indoor','Outdoor'],d.surface)+'</div>';
+  h+='<div><label class="fl">Green Type</label>'+mkSel('green',['Artificial','Natural'],d.green)+'</div>';
+  h+='</div>';
+  h+='<div><label class="fl">Session Goal</label>'+mkText('f_goal',d.goal,'e.g. Improve tempo consistency')+'</div>';
+  h+='</div>';
+
+  if(showUpload){
+    h+='<div class="card" style="border-color:#ccd7f0">';
+    h+='<div class="st">Compare with Previous Session</div>';
+    h+='<p style="font-size:13px;color:#666;margin-bottom:12px">Upload a previous session .json to add comparison columns to the report.</p>';
+    h+='<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+    h+='<label class="ul">Upload Session File<input type="file" accept=".json" style="display:none" onchange="loadPrev(event)"></label>';
+    if(ps){
+      h+='<span style="font-size:13px;color:#1a7a3b;font-weight:600">Loaded: S'+(ps.d&&ps.d.num||'?')+' — '+(ps.d&&ps.d.athlete||'')+' ('+(ps.d&&ps.d.date||'))')+'</span>';
+    } else {
+      h+='<span style="font-size:13px;color:#aaa">No file loaded</span>';
     }
+    h+='</div></div>';
+  }
+  return h;
+}
+
+function renderPutting(sec, title){
+  return '<div class="card"><div class="st">'+title+' — 10 Strokes</div>'+numGrid(PUT_KEYS,sec)+'</div>';
+}
+function renderMind(){
+  return '<div class="card"><div class="st">Mind Training — 12 Minutes</div>'+numGrid(MIND_KEYS,'mind')+'</div>';
+}
+function renderPostFG(){
+  var h=renderPutting('post','Post Putting');
+  h+='<div class="card"><div class="st">Performance Training — Focus Golf</div>';
+  h+='<p style="font-size:12px;color:#888;margin-top:-8px;margin-bottom:14px">Simultaneous with post putting — real-time biofeedback putting trigger</p>';
+  h+=numGrid(FG_KEYS,'fg')+'</div>';
+  return h;
+}
+
+function renderReport(){
+  var d=S.d;
+  var ps=S.prevSession&&S.prevSession.d?S.prevSession.d:null;
+  var hp=!!ps;
+
+  var h='<div class="card" style="border-left:4px solid #003DA5">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">';
+  h+='<div><div style="font-size:22px;font-weight:700">'+(d.athlete||'Athlete')+'</div>';
+  h+='<div style="font-size:13px;color:#888;margin-top:2px">Session #'+d.num+' &middot; '+d.date+' &middot; Trainer: '+(d.trainer||'—')+'</div></div>';
+  h+='<div class="chips">';
+  var chips=[['Putter',d.putterType],['Handed',d.handed],['Length',d.puttLen?d.puttLen+d.puttUnit:'—'],['Surface',d.surface+'/'+d.green]];
+  for(var i=0;i<chips.length;i++)
+    h+='<div class="chip"><span class="cl">'+chips[i][0]+'</span><span class="cv">'+chips[i][1]+'</span></div>';
+  h+='</div></div>';
+  if(d.goal) h+='<div style="font-size:13px;color:#666;margin-top:10px">Goal: '+d.goal+'</div>';
+  h+='</div>';
+
+  // Putting table
+  h+='<div style="font-size:15px;font-weight:700;margin-bottom:10px">Putting Performance</div>';
+  h+='<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if(hp) h+='<th class="c">S'+ps.num+' Pre</th>';
+  h+='<th class="c">Pre</th><th class="c">Post</th><th class="c">Pre&rarr;Post</th>';
+  if(hp) h+='<th class="c">vs S'+ps.num+' Post</th>';
+  h+='</tr></thead><tbody>';
+  for(var i=0;i<PUT_KEYS.length;i++){
+    var m=PUT_KEYS[i], va=d.pre[m.k], vb=d.post[m.k];
+    h+='<tr><td style="font-weight:600">'+m.l+'</td>';
+    if(hp) h+='<td class="tg">'+(ps.pre&&ps.pre[m.k]?ps.pre[m.k]+m.u:'—')+'</td>';
+    h+='<td class="c">'+(va?va+m.u:'—')+'</td>';
+    h+='<td class="c">'+(vb?vb+m.u:'—')+'</td>';
+    h+=dCell(vb,va);
+    if(hp) h+=dCell(vb,ps.post&&ps.post[m.k]);
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+
+  // Mind table
+  h+='<div style="font-size:15px;font-weight:700;margin-bottom:10px">Mind Training — 12 Minutes</div>';
+  h+='<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if(hp) h+='<th class="c">Session '+ps.num+'</th>';
+  h+='<th class="c">This Session</th>';
+  if(hp) h+='<th class="c">&Delta;</th>';
+  h+='</tr></thead><tbody>';
+  for(var i=0;i<MIND_KEYS.length;i++){
+    var m=MIND_KEYS[i], v=d.mind[m.k];
+    h+='<tr><td style="font-weight:600">'+m.l+'</td>';
+    if(hp) h+='<td class="tg">'+(ps.mind&&ps.mind[m.k]?ps.mind[m.k]+m.u:'—')+'</td>';
+    h+='<td class="c">'+(v?v+m.u:'—')+'</td>';
+    if(hp) h+=dCell(v,ps.mind&&ps.mind[m.k]);
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+
+  // Focus Golf table
+  h+='<div style="font-size:15px;font-weight:700;margin-bottom:4px">Performance Training — Focus Golf</div>';
+  h+='<div style="font-size:12px;color:#888;margin-bottom:10px">Real-time biofeedback putting trigger &middot; simultaneous with post putting</div>';
+  h+='<div class="tbw"><table><thead><tr><th>Metric</th>';
+  if(hp) h+='<th class="c">Session '+ps.num+'</th>';
+  h+='<th class="c">This Session</th>';
+  if(hp) h+='<th class="c">&Delta;</th>';
+  h+='</tr></thead><tbody>';
+  for(var i=0;i<FG_KEYS.length;i++){
+    var m=FG_KEYS[i], v=d.fg[m.k];
+    h+='<tr><td style="font-weight:600">'+m.l+'</td>';
+    if(hp) h+='<td class="tg">'+(ps.fg&&ps.fg[m.k]?ps.fg[m.k]+m.u:'—')+'</td>';
+    h+='<td class="c">'+(v?v+m.u:'—')+'</td>';
+    if(hp) h+=dCell(v,ps.fg&&ps.fg[m.k]);
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+
+  // Summary
+  h+='<div class="card" style="background:#f7f9ff;border-color:#ccd7f0;margin-bottom:20px">';
+  h+='<div class="st">Session Summary</div>';
+  h+='<textarea id="f_summary" rows="6" placeholder="Write your session notes and recommendations here...">'+(S.summary||'')+'</textarea>';
+  h+='</div>';
+
+  h+='<div class="nav fe no-print">';
+  h+='<button onclick="dlJSON()">Save Session JSON</button>';
+  h+='<button class="btn-p" onclick="window.print()">Print / Export PDF</button>';
+  h+='</div>';
+  return h;
+}
+
+/* ── main render ─────────────────────────────────────────────── */
+function render(){
+  try {
+    var s=S.step;
+    var content='';
+    if(s===0) content=renderSetup();
+    else if(s===1) content=renderPutting('pre','Pre Putting');
+    else if(s===2) content=renderMind();
+    else if(s===3) content=renderPostFG();
+    else content=renderReport();
+
+    var nav='';
+    if(s<4){
+      nav='<div class="nav '+(s>0?'sb':'fe')+' no-print">';
+      if(s>0) nav+='<button onclick="go(-1)">← Back</button>';
+      nav+='<button class="btn-p" onclick="go(1)">'+(s===3?'Generate Report →':'Next →')+'</button>';
+      nav+='</div>';
+    } else {
+      nav='<div class="nav no-print"><button onclick="go(-4)">← Start New Session</button></div>';
+    }
+
+    var prog='<div class="prog no-print">';
+    var STEPS=['Setup','Pre Putting','Mind Training','Post + Focus Golf','Report'];
+    for(var i=0;i<STEPS.length;i++){
+      prog+='<div class="pi">';
+      prog+='<div class="pb" style="background:'+(i<=s?'#003DA5':'#ddd')+'"></div>';
+      prog+='<div class="pl" style="color:'+(i===s?'#003DA5':'#bbb')+'">'+STEPS[i]+'</div>';
+      prog+='</div>';
+    }
+    prog+='</div>';
+
+    document.getElementById('app').innerHTML=prog+content+nav;
+  } catch(e) {
+    document.getElementById('app').innerHTML='<div style="padding:20px;color:#b83232;background:#fff;border-radius:8px;border:1px solid #f0c0c0"><strong>Error:</strong> '+e.message+'</div>';
+  }
+}
+
+/* ── file load / download ────────────────────────────────────── */
+function loadPrev(e){
+  var f=e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{ S.prevSession=JSON.parse(ev.target.result); render(); }
+    catch(err){ alert('Invalid session file.'); }
   };
   r.readAsText(f);
 }
 
-function dlJSON() {
-  var payload = { d: S.d, summary: S.summary };
-  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  var name = 'thrive_s' + S.d.num + '_' + (S.d.athlete || 'athlete').replace(/\s+/g,'_') + '_' + S.d.date + '.json';
-  a.download = name;
+function dlJSON(){
+  collectStep(S.step);
+  var blob=new Blob([JSON.stringify({d:S.d,summary:S.summary},null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='thrive_s'+S.d.num+'_'+(S.d.athlete||'athlete').replace(/\s+/g,'_')+'_'+S.d.date+'.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-  render();
-});
+window.addEventListener('DOMContentLoaded', render);
 </script>
 </body>
 </html>
